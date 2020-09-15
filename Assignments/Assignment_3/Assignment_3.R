@@ -21,8 +21,14 @@ sfdfdsf
 # Vectors are 1-dimensional series of values in some order
 1:10 # ':' only works for integers
 letters # built-in pre-made vector of a - z
-
-
+class(1:10)
+class(1)
+class(1L)
+class(333L)
+class(333.3L)
+class(3.45)
+class(1.0)
+class(1.1)
 
 vector1 <- c(1,2,3,4,5,6,7,8,9,10)
 vector2 <- c(5,6,7,8,4,3,2,1,3,10)
@@ -60,16 +66,31 @@ head(dat)
 dat$Species
 dat$Sepal.Length
 
+class(dat)
+class(dat$Species)
 # You can also use square brackets to get specific 1-D or 2-D subsets of a data frame (rows and/or columns)
 dat[1,1] # [Rows, Columns]
 dat[1:3,5]
+letters[5]
+letters[c(5,6)]
+letters[1:10]
+
+let <- c(1,3,5,7,9)
+letters[let]
+#Made a new vector of 1,3,5,7,9, and we stored that as an object called let and then used object to tell letters which ones 
+#we wanted. 
+
 
 # Plotting ####
 
 # Can make a quick plot....just give vectors for x and y axes
+#plot is the function. 
+#for the x values, those will be the column in dat called Petal.length ,,, and for the y values used make those be the column in dat called Sepal.Length 
 plot(x=dat$Petal.Length, y=dat$Sepal.Length)
 plot(x=dat$Species, y=dat$Sepal.Length)
-
+#Second plot different because the X value has the data type of a factor. 
+#When 2nd plot runs it runs a class and sees the X values are a factor, so it says x axis is gonna be categories, but be numeric so can't have dot plot
+#Y axis on 2nd plot is numeric so it determines a box plot. 
 
 # Object "Classes" ####
 
@@ -87,12 +108,19 @@ str(dat)
 # Let's try
 nums <- c(1,1,2,2,2,2,3,3,3,4,4,4,4,4,4,4,5,6,7,8,9)
 class(nums) # make sure it's numeric
+plot(1:1000)
+
+
+class(nums)
+
+
+
 
 # convert to a factor
 as.factor(nums) # show in console
 nums_factor <- as.factor(nums) #assign it to a new object as a factor
 class(nums_factor) # check it
-
+length(nums)
 #check it out
 plot(nums) 
 plot(nums_factor)
@@ -103,10 +131,13 @@ plot(nums_factor)
 plot(nums, main = "My Title", xlab = "My axis label", ylab = "My other axis label")
 
 
-?jpeg()
-
-
+jpeg("./exampleplot.jpeg")
+plot(nums, main = "My Title", xlab = "My axis label", ylab = "My other axis label")
 dev.off()
+#Jpeg opens a graphics device on your computer, and creates a link to an empty file. Named example plot .jpeg
+#Anything you type after that will go to that file. 
+#dev.off closes links to open files.
+#the ./ says it's getting saved right where you are.
 
 
 
@@ -122,7 +153,7 @@ col3 = factor(c(1,2,3,4)) # see how we can designate something as a factor
 
 # here's the data frame command:
 data.frame(Clothes = col1, Numbers = col2, Factor_numbers = col3) # colname = vector, colname = vector....
-df1 = data.frame(Clothes = col1, Numbers = col2, Factor_numbers = col3) # assign to df1
+df1 <-  data.frame(Clothes = col1, Numbers = col2, Factor_numbers = col3) # assign to df1
 df1 # look at it...note column names are what we gave it.
 
 
@@ -132,14 +163,30 @@ df1 # look at it...note column names are what we gave it.
 
 # Make a data frame from the first 20 rows of iris that has only Species and Sepal.Length columns
 # save it into an object called "dat3"
+data("iris")
 
 
+#Two ways to answer this. 
+#FIrst way
+#First assign a variable called spp short for species. Concatenate Species, and Sepal.Length
+#Then assign/concatenate variable rows to 1:20 
+#Very important
+
+spp <- c("Species","Sepal.Length")
+rows <- c(1:20)
+dat3 <-  iris[rows,spp]
 
 
+#Very important..
+#Second way, since iris is 2 dimensional you can give it rows followed by columns. Always in that order
+iris[1:20,c("Species","Sepal.Length")]
+names(iris)
 
+
+iris[1:5,c(5,1)]
 # WRITING OUT FILES FROM R ####
 ?write.csv()
-
+write.csv(dat3,"./NUNEZ_first_file.csv")
 
 # Write your new object "dat3" to a file named "LASTNAME_first_file.csv" in your PERSONAL git repository
 
@@ -166,9 +213,10 @@ for(i in levels(dat$Species)){
 
 
 # YOUR REMAINING HOMEWORK ASSIGNMENT (Fill in with code) ####
+dat <- iris
 
 # 1.  Make a scatterplot of Sepal.Length vs Sepal.Width. See if you can get the points to be colored by "Species"
-
+  plot(x=dat$Sepal.Length, y=dat$Sepal.Width,col=dat$Species)
 
 # 2.  Write the code to save it (with meaningful labels) as a jpeg file
 
