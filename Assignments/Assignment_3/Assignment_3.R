@@ -219,13 +219,16 @@ dat <- iris
   plot(x=dat$Sepal.Length, y=dat$Sepal.Width,col=dat$Species)
 
 # 2.  Write the code to save it (with meaningful labels) as a jpeg file
-
+  jpeg("./PlotQuestion2.jpeg")
+  plot(x=dat$Sepal.Length, y=dat$Sepal.Width,col=dat$Species)
+  dev.off()
 
 # 3.  Subset the Iris data set to only include rows from the setosa and virginica Species
+  variable_NUNEZ = iris[c(1:50,101:150),]
 
 
 # 4.  Write code to save this new subset as a .csv file called setosa_and_virginica.csv
-
+  write.csv(variable_NUNEZ, "./setosa_and_virginica.csv")
 
 # 5.  Upload this R script (with all answers filled in and tasks completed) to canvas and GitHub
       # I should be able to run your R script and get all the plots created and saved, etc.
