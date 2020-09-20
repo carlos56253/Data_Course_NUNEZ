@@ -13,7 +13,6 @@
 
 # Then, make sure to upload this to both Canvas and your GitHub repository
 
-sfdfdsf
 
 
 # Vector operations! ####
@@ -165,7 +164,7 @@ df1 # look at it...note column names are what we gave it.
 # save it into an object called "dat3"
 data("iris")
 
-
+iris
 #Two ways to answer this. 
 #FIrst way
 #First assign a variable called spp short for species. Concatenate Species, and Sepal.Length
@@ -224,8 +223,16 @@ dat <- iris
   dev.off()
 
 # 3.  Subset the Iris data set to only include rows from the setosa and virginica Species
-  variable_NUNEZ = iris[c(1:50,101:150),]
-
+ variable_NUNEZ = iris[c(1:50,101:150),]
+(variable_NUNEZ)
+  
+  #New way
+variable <- iris$Species %in% c("setosa","virginica")
+iris[variable,]  
+# example
+x <- 1:10
+y <- 1:2
+x+y
 
 # 4.  Write code to save this new subset as a .csv file called setosa_and_virginica.csv
   write.csv(variable_NUNEZ, "./setosa_and_virginica.csv")
