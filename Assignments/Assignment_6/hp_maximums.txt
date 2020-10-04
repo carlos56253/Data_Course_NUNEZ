@@ -1,0 +1,22 @@
+ 
+  #calculation for max hp of mtcars 
+    mtcars_origin <- max(mtcars$hp)
+  
+  #Subset for automatic transmissions
+
+    auto_transmissions <- mtcars$am %in% 0
+  Asubset <- mtcars[auto_transmissions,]
+  
+  #calculation for max hp of automatic transmission subset
+    mtcars_auto <- max(Asubset$hp)
+  
+  #Subset for displacement >= 200
+
+    auto_displacement <- mtcars$disp >=200   
+  Bsubset <- mtcars[auto_displacement,]
+  
+  #calculation for max hp of Displacement data 
+    mtcars_max200 <- max(Bsubset$hp)
+  
+  #Print command for the three values obtained
+    print(c(mtcars_origin, mtcars_auto,mtcars_max200))

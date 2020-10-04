@@ -26,6 +26,11 @@ data("midwest", package = "ggplot2")
 # Let’s initialize a basic ggplot based on the midwest dataset that we loaded.
 ggplot(midwest) # what do you see?
 
+
+
+names(midwest)
+
+
 # give it some aesthetics to work with...
 ggplot(midwest, aes(x=area, y=poptotal))  # area and poptotal are columns in 'midwest'
 
@@ -46,10 +51,10 @@ ggplot(midwest, aes(x=area, y=poptotal)) + geom_point() + geom_smooth(method = "
 
 # Store your plot as an object to add to...
 p <- ggplot(midwest, aes(x=area, y=poptotal)) + geom_point() + geom_smooth(method = "lm")
-
+p
 # Zoom in
-p + lims(x=c(0,0.1),y=c(0,1000000)) # what did this do?
-p + coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000)) # how is this different?
+p + lims(x=c(0,0.1),y=c(0,1000000)) # what did this do? #add a new layer. x is 2 element vector same with y. It gives minimum x and y values. Deleted all data points that aren't assigned
+p + coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000)) # how is this different? # Gives you a different view. 
 
 # Store this new zoomed-in plot
 p2 <- p + coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000))
@@ -60,6 +65,11 @@ p2 + labs(title="Area Vs Population",
           y="Population", 
           x="Area", 
           caption="Midwest Demographics")
+
+
+
+
+
 
 # Nifty!  So here's the full function call to make this plot:
 ggplot(midwest, aes(x=area, y=poptotal)) + 
@@ -90,14 +100,26 @@ p3 <- ggplot(midwest, aes(x=area, y=poptotal)) +
 p3
 
 # Don't like those colors?
-p3 + scale_color_brewer(palette = "Set1")
+p3 + scale_color_brewer(palette = "Dark2")
 
 # Want more color choices? You can check them out in the RColorBrewer package, or even make your own
 library(RColorBrewer)
 brewer.pal.info
 
+
+
+
+
 # Make your own and take a peek at it:
+
+install.packages("remotes")
+remotes::install_github("wilkelab/cowplot")
+install.packages("colorspace", repos = "http://R-Forge.R-project.org")
+remotes::install_github("clauswilke/colorblindr")
+
+
 library(colorblindr)
+
 pal = c("#c4a113","#c1593c","#643d91","#820616","#477887","#688e52",
         "#12aa91","#705f36","#8997b2","#753c2b","#3c3e44","#b3bf2d",
         "#82b2a4","#894e7d","#a17fc1","#262a8e","#abb5b5","#000000")
@@ -125,8 +147,10 @@ p4 = ggplot(midwest, aes(x=area/max(midwest$area), y=log10(poptotal))) +
 
 p4
 
-
+names(midwest)
 # Want to divide up your plot into multiple ones based on a categorical variable?
+
+#p4 + facet_wrap(~area)
 p4 + facet_wrap(~ state)
 p4 + facet_wrap(~ state, scales = "free") + theme(legend.position = "none")
 p4 + facet_wrap(~ state) + theme(legend.position = "none", strip.text.x = element_text(size = 12, face="bold"))
@@ -138,13 +162,55 @@ p4 + facet_wrap(~ state) + theme(legend.position = "none",
 # Some other "geom" types ... for categorical x axis
 p5 = ggplot(midwest, aes(x=state,y=percollege, fill=state)) + labs(x="State",y="Percent with college degree")
 p5
-
+# Don't use box plots to present stats.
 p5 + geom_boxplot()
+#violin plot is best way to show density if you got a categorical x axis. 
 p5 + geom_violin()
-p5 + geom_bar(stat="identity") # something wrong with this picture!
+#density makes it very ugly, takes first value
+p5 + geom_density()
+
+ggplot(midwest, aes(x=percollege, fill=state)) + geom_density(aplpha=.5)
+
+p5 + geom_bar(stat="identity") # something wrong with this picture! Not good to show things on percentage scale. 
+
+p5 + geom_col(stat ="")
+
+
+
+
+data("mtcars")
+names(mtcars)
+
+ggplot(mtcars, aes(x=mpg, y=hp))+ geom_point(aes(col=as.factor(cyl))) +
+  geom_smooth(method="lm",color="firebrick")+
+  labs(title="Mpg vs Horsepower",
+      caption="Automotives")
+
+#This is the way to do it... Good you're comparing 3 variables. 
+#in order to use geom_smooth it won't happen if it's not categorical. 
+
+ggplot(mtcars, aes(y=mpg, x=hp))+ geom_point(aes(col=as.factor(cyl))) +
+  geom_smooth(method="lm",color="firebrick")+
+  labs(title="Mpg vs Horsepower",subtitle = "With respect to number of Cylinders", x="Horse Power", y="Miles per Gallon",
+       caption="Automotives LLC")
+
+
+
+
+
+data ("iris")
+names(iris)
+
+iris <- filter(iris, Speices!= "setosa")
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, color=Species))+
+  geom_point()+
+  geom_smooth()
+ggsave("./myplot.png", width = 6, height =6, dpi=500)
+
 
 
 # Geoms for looking at a single variable's distribution:
+
 library(carData)
 data("MplsStops")
 
@@ -208,7 +274,7 @@ ggplot(MplsStops, aes(x=lat,y=long)) + geom_bin2d() +
 gganimate::
 # More advanced understanding of R functions will be required to replicate the following section, but it
 # is included as an example follow-up analysis
-
+ 
 # Plot using two related data sets
 data("MplsDemo") # demographic info by neighborhood can be joined to our police stop dataset
 
@@ -233,6 +299,7 @@ ggplot(counts, aes(x=Var1,y=Freq)) + geom_point() + geom_smooth(method="lm") +
   theme_minimal()
 
 
+getwd()
 
 
 
