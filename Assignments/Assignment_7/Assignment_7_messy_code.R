@@ -19,6 +19,9 @@ utah = read.csv("./Utah_Religions_by_County.csv")
 
 names(utah)
 utah_long = gather(utah,key = Religion, value = Proportion, -c(1:3) )
+#Pivot_longer ....need to sort relgions...
+
+df <- pivot_longer(utah,-c(1:3), names_to = "Religion", values_to = "Proportion", names_prefix = "Religion")
 #look at data structure 
 str(utah_long)
 
