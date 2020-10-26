@@ -15,26 +15,62 @@ data("iris")
 
 
 # Get to know your data ####
-mtcars %>% ggpairs()
+mtcars %>% ggpairs()#ggpairs() used to make a "scatter" plot matrix with the data given. 
 iris %>% filter(Species == "setosa") %>% ggpairs()
 iris %>% ggpairs(mapping = c("Species","Sepal.Length"))
 
 
 # Build possible models ####
+ggplot(iris, aes(x=Sepal.Width, y= Sepal.Length, color=Species)) + 
+  geom_point()+
+  geom_smooth(method = "lm")
 
 # lm() is linear model. There are LOTS of other model types
+
 mod1 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width)
+#Species not considered. Can't determine if sepal width actutally is important for sepal length
+
+ggplot(iris, aes(x=Sepal.Width, y= Sepal.Length)) + 
+  geom_point()+
+  geom_smooth(method = "lm")
+#Visualize the data and look at summary below. 
+
+#####################
+
 mod2 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width + Species)
+#y-int can vary based on species. Two predictor variables that might influence sepal Length
+
+ggplot(iris, aes(x=Sepal.Width, y= Sepal.Length)) + 
+  geom_point()+
+  geom_smooth(method = "lm")+
+  facet_wrap(~Species)
+
+
+#Visualize the data and look at summary below. 
+
+###################
+
 mod3 <- lm(data=iris, formula = Sepal.Length ~ Sepal.Width * Species)
+# y-int and slope vary based on species
 
+ggplot(iris, aes(x=Sepal.Width, y= Sepal.Length, color=Species)) + 
+  geom_point()+
+  geom_smooth(method = "lm")
 
+#Visualize the data and look at summary below. 
+
+#####################
 
 # Look at model summaries ####
 summary(mod1)
 summary(mod2)
 summary(mod3)
+#Intercept is y int of the first column, the variables below it you add to that intercept 
+#for every time the x value goes over one, so in our example Setosa is base/ first column, 
+#then for Versicolor add that value to the "original intercept"/Setosa. 
+#Residual = Distance from predicted points to what you actually observed. 
 
-# how to interpret results?
+ # how to interpret results?
 # Coefficients, P-values, Adjusted R-squared
 
 
@@ -54,7 +90,8 @@ mod1mse <- mean(residuals(mod1)^2)
 mod2mse <- mean(residuals(mod2)^2)
 mod3mse <- mean(residuals(mod3)^2)
 
-mod1mse ; mod2mse ; mod3mse
+mod1mse ; mod2mse ; mod3mse # looking at the average residual of each model to tell which one fits 
+#The line the best. ; says new command. #Choose model two, bc it's much simpler than model 3. 
 
 # Evaluate predictions ####
 df_mod1 <- add_predictions(iris,mod1) # adds model prediction column using a single model
@@ -81,8 +118,13 @@ ggplot(df,aes(x=Sepal.Width,color=Species)) +
   geom_point(aes(y=pred),color="Black") +
   facet_wrap(~model) +
   theme_bw()
+#R is perfectly happy with giving you an answer to a wrong model, so know the filed that you're gonna 
+#be explaining before hand otherwise R will "give" you whatever you want. 
 
 # which model is best?
+
+
+
 
 
 # Using mtcars #
