@@ -1,0 +1,32 @@
+---
+title: "DataA"
+author: "Carlos"
+date: "10/26/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+df <- read.csv("./Data/GradSchool_Admissions.csv")
+library(tidyverse)
+```
+
+Grad school addmissions. This is a binary outcome (TRUE/FALSE) so we will use logistic regression
+to predict grad school admission success.
+
+
+```{r,echo=FALSE}
+
+head(df)
+df$admit <- as.logical(df$admit)
+
+
+mod <- glm(df, 
+           formula = admit ~ gre + gpa + rank,
+           family = "binomial")
+
+add_predictions(df, mod, type = "response")%>% 
+  ggplot(aes(x=gpa, y=pred, color = factor(rank)))+
+  geom_smooth()
+
+```

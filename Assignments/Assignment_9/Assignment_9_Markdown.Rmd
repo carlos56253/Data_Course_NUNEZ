@@ -1,0 +1,131 @@
+---
+title: "Assignment_9"
+author: "Carlos Nunez"
+date: "11/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+#First load the libraries you will use.
+library(tidyverse)
+library(modelr)
+library(GGally)
+library(MASS)
+library(broom)
+library(fitdistrplus)
+#Load the data.
+df <- read.csv("../../Data/GradSchool_Admissions.csv", stringsAsFactors = FALSE)
+
+```
+
+```{r, echo=FALSE, message= FALSE, include= FALSE}
+
+#View the data. 
+head(df)
+
+#View data structue types.
+str(df)
+
+#Clean up data
+df$admit <- as.logical(df$admit) #Set the admit variable to a logical value. 
+
+df$rank <- as.factor(df$rank) # Set the rank variable to factor. 
+
+```
+One of the goals for this assignment was to build and test different models that best help to 
+understand the effects that GPA, GRE, and Rank had on the admissions to Graduate School.The different
+models tested are shown below. 
+
+
+```{r, echo=FALSE, message= FALSE,}
+
+#create different logistic regression models.
+model_1 <- glm(data = df, 
+               formula = admit ~ gpa + gre + rank,
+               family = "binomial")
+model_1
+
+
+model_2 <- glm(data = df, 
+               formula = admit ~ gpa * gre * rank,
+               family = "binomial")
+model_2
+
+
+model_3 <- glm(data = df,
+               formula = admit ~ gpa + gre *rank,
+               family = "binomial")
+model_3
+
+
+model_4 <- glm(data = df,
+               formula = admit ~ gpa * gre + rank,
+               family = "binomial")
+model_4
+
+```
+
+
+```{r,echo=FALSE, include=FALSE}
+#Run summary() for each model
+summary(model_1) # Has most significant values for the interaction between the exploratory variables. 
+summary(model_2)
+summary(model_3)
+summary(model_4)
+
+```
+
+
+```{r, echo=FALSE, message= FALSE, include= FALSE}
+
+# Run Residuals to find the best model
+
+mean(model_1$residuals^2)# has best/ lowest value for residuals. Model one is best.  
+#5.542
+mean(model_2$residuals^2)
+#5.921
+mean(model_3$residuals^2)
+#5.545
+mean(model_4$residuals^2)
+#5.93
+
+```
+
+Once the best model was determined, a predictions function was made in order to help give more insight as to how these exploratory variables were connected, by giving the probabilities of getting into Graduate school based on the exploratory variables. 
+Plots were created to help visualize how the exploratory variables each affected the chances of being admitted into Graduate School. These plots are shown below.  
+
+
+```{r, echo = FALSE, message= FALSE}
+#Once best model found make predictions
+df1 <- add_predictions(df, model_1, type = "response")
+
+#Visualize the data and look at the different relationships each exploratory variable has with admit
+ggplot(df1, aes(x=gre, y=pred, color = rank))+
+  geom_point()+
+  theme_minimal()+
+  labs(title = "Probablity of Admission vs GRE",subtitle = "Effect of GRE on Admissions",
+       x ="GRE", y= "Probablity of Admission")
+
+ggplot(df1, aes(x=gpa, y=pred, color = rank))+
+  geom_point()+
+  theme_minimal()+
+  labs(title = "Probablity of Admission vs GPA",subtitle = "Effect of GPA on Admissions",
+       x ="GPA", y= "Probablity of Admission")
+
+
+ggplot(df1, aes(x=rank, y=pred, color = gpa))+
+  geom_point()+
+  theme_minimal()+
+  labs(title = "Probablity of Admission vs Rank",subtitle = "Effect of Rank on Admissions",
+       x ="Rank", y= "Probablity of Admission")
+
+ggplot(df1, aes(x=rank, y=pred, color = gre))+
+  geom_point()+
+  theme_minimal()+
+  labs(title = "Probablity of Admission vs Rank",subtitle = "Effect of Rank on Admissions",
+       x ="Rank", y= "Probablity of Admission")
+
+```
