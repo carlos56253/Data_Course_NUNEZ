@@ -35,10 +35,10 @@ df$admit <- as.logical(df$admit) #Set the admit variable to a logical value.
 df$rank <- as.factor(df$rank) # Set the rank variable to factor. 
 
 ```
-One of the goals for this assignment was to build and test different models that best help to 
-understand the effects that GPA, GRE, and Rank had on the admissions to Graduate School.The different
-models tested are shown below. 
 
+The main purpose of this analysis is to understand how significant if at all GPA, GRE, and School Rank are in affecting the chances of a student being accepted into graduate school. 
+
+Several models were tested to find the best one which helped to show the significance that GPA, GRE, and Rank each have on the Admissions to Graduate School.The different models tested are shown below. 
 
 ```{r, echo=FALSE, message= FALSE,}
 
@@ -67,7 +67,7 @@ model_4 <- glm(data = df,
 model_4
 
 ```
-
+P Values of each variable were also considered when analyzing the models. 
 
 ```{r,echo=FALSE, include=FALSE}
 #Run summary() for each model
@@ -94,7 +94,7 @@ mean(model_4$residuals^2)
 
 ```
 
-Once the best model was determined, a predictions function was made in order to help give more insight as to how these exploratory variables were connected, by giving the probabilities of getting into Graduate school based on the exploratory variables. 
+Once the best model was determined, a prediction's function was made in order to help give more insight as to how these exploratory variables each affect the probability of being admitted into Graduate School.
 Plots were created to help visualize how the exploratory variables each affected the chances of being admitted into Graduate School. These plots are shown below.  
 
 
@@ -109,6 +109,8 @@ ggplot(df1, aes(x=gre, y=pred, color = rank))+
   labs(title = "Probablity of Admission vs GRE",subtitle = "Effect of GRE on Admissions",
        x ="GRE", y= "Probablity of Admission")
 
+
+
 ggplot(df1, aes(x=gpa, y=pred, color = rank))+
   geom_point()+
   theme_minimal()+
@@ -116,16 +118,25 @@ ggplot(df1, aes(x=gpa, y=pred, color = rank))+
        x ="GPA", y= "Probablity of Admission")
 
 
+
+
 ggplot(df1, aes(x=rank, y=pred, color = gpa))+
   geom_point()+
   theme_minimal()+
-  labs(title = "Probablity of Admission vs Rank",subtitle = "Effect of Rank on Admissions",
+  labs(title = "Probablity of Admission vs School Rank",subtitle = "Effect of School Rank on Admissions",
        x ="Rank", y= "Probablity of Admission")
+
+
 
 ggplot(df1, aes(x=rank, y=pred, color = gre))+
   geom_point()+
   theme_minimal()+
-  labs(title = "Probablity of Admission vs Rank",subtitle = "Effect of Rank on Admissions",
+  labs(title = "Probablity of Admission vs School Rank",subtitle = "Effect of School Rank on Admissions",
        x ="Rank", y= "Probablity of Admission")
 
 ```
+
+
+In conclusion all three variables are significant in determining the probability that a student will
+be accepted into graduate school. Statistically from the P-values taken, and also from each respective 
+plot that was made. Each plot showing the expected correlation between one of the variables and the probability of a student being accepted into Graduate School. 
