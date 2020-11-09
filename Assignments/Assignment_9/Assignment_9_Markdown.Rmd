@@ -2,7 +2,12 @@
 title: "Assignment_9"
 author: "Carlos Nunez"
 date: "11/1/2020"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -15,128 +20,132 @@ library(modelr)
 library(GGally)
 library(MASS)
 library(broom)
-library(fitdistrplus)
+library(gridExtra)
+```
+ 
+```{r, echo=TRUE, message=FALSE, include=FALSE}
+# Load and Clean the Data.
+
 #Load the data.
 df <- read.csv("../../Data/GradSchool_Admissions.csv", stringsAsFactors = FALSE)
-
-```
-
-```{r, echo=FALSE, message= FALSE, include= FALSE}
 
 #View the data. 
 head(df)
 
-#View data structue types.
+#View data structure types.
 str(df)
 
-#Clean up data
-df$admit <- as.logical(df$admit) #Set the admit variable to a logical value. 
+#Clean up data.
 
-df$rank <- as.factor(df$rank) # Set the rank variable to factor. 
+df$admit <- as.logical(df$admit) #Set the admit variable from integer to a logical value. 
+#They were either admitted or not. 
+
+df$rank <- as.factor(df$rank) # Set the rank variable from integer to factor
+#you want to give the categorical data different levels they're not just numbers. 
 
 ```
 
-The main purpose of this analysis is to understand how significant if at all GPA, GRE, and School Rank are in affecting the chances of a student being accepted into graduate school. 
 
-Several models were tested to find the best one which helped to show the significance that GPA, GRE, and Rank each have on the Admissions to Graduate School.The different models tested are shown below. 
+## Introduction
 
-```{r, echo=FALSE, message= FALSE,}
+The main purpose of this analysis was to observe the interactions between GPA, GRE, and School Rank, and how they affect the probability of a student being admitted into graduate school. 
 
-#create different logistic regression models.
+Several models were built using the function stepAIC(). stepAIC() works by trying all possible interactions of the different variables provided from a sample model. Two sample models were used, models 1 and 2. A step$formula was used to help find the best model generated. Furthermore summary and residuals tests were performed on both models.The aim was to find the simplest and best model for explaining the variables and their affects on a student's chances of being admitted into graduate school. Models 3 and 4 were built used he stepAIC() function, and were the onces used for the analysis. 
+
+Models and stepAIC
+```{r, echo=TRUE, results="hide"}
+
+#create different logistic regression models/sample models.
 model_1 <- glm(data = df, 
                formula = admit ~ gpa + gre + rank,
                family = "binomial")
-model_1
 
+summary(model_1)
 
 model_2 <- glm(data = df, 
                formula = admit ~ gpa * gre * rank,
                family = "binomial")
-model_2
+summary(model_2)
+
+#########################################################
+#sample models being fed into the stepAIC() to create the optimal models.
+step1 <- stepAIC(model_1)
+step1$formula #Find the best model
 
 
-model_3 <- glm(data = df,
-               formula = admit ~ gpa + gre *rank,
-               family = "binomial")
-model_3
+model_3 <- glm(data = df, 
+              formula = step1$formula)
 
 
-model_4 <- glm(data = df,
-               formula = admit ~ gpa * gre + rank,
-               family = "binomial")
-model_4
+step2 <- stepAIC(model_2)
+step2$formula #Find the best model
+
+
+model_4 <- glm(data = df, 
+              formula = step2$formula)
 
 ```
-P Values of each variable were also considered when analyzing the models. 
+The main differences between sample models 1 and 2, is that model 1 is essentially saying admission as a function of gpa and gre and rank, while model 2 is read admission as a function of gpa, gre, rank, and the interactions between gpa and rank, gre and rank, as well as gpa, gre, and rank. Another point to note is that in model 1 only the y-intercept of the model can vary based on the variables given, while in model 2 both y-intercept and slope can vary based on the variables given. 
 
-```{r,echo=FALSE, include=FALSE}
-#Run summary() for each model
-summary(model_1) # Has most significant values for the interaction between the exploratory variables. 
-summary(model_2)
-summary(model_3)
+
+Summary of the Models
+```{r,echo=TRUE}
+# Summary Function
+
+summary(model_3)# Has most significant values for the interaction between the exploratory variables.
+#It also shows that the rank variable has the most significant statistical significance. 
 summary(model_4)
 
 ```
 
+Residuals of the Models
+```{r, echo=TRUE, results="hide"}
 
-```{r, echo=FALSE, message= FALSE, include= FALSE}
-
-# Run Residuals to find the best model
-
-mean(model_1$residuals^2)# has best/ lowest value for residuals. Model one is best.  
-#5.542
-mean(model_2$residuals^2)
-#5.921
 mean(model_3$residuals^2)
-#5.545
-mean(model_4$residuals^2)
-#5.93
+#0.1949
+mean(model_4$residuals^2) #model_4 does have a slightly better residual but the differences is insignificant. 
+#0.1943
 
 ```
+After running the statistical tests it was determined that model_3 was best suited for the analysis. This conclusion is based on the summary function which showed how model_3 contained statistically significant values according to it's p-values (all less than 0.05), for all of its null hypothesis when compared to model_4 which did not. model_3 was also the simplest model, and the mean squared residuals were insignificantly different. It was also observed from the summary function that the school rank had the most statistically significant value, given it was the lowest p value in the function. 
 
+
+## Analysis
 Once the best model was determined, a prediction's function was made in order to help give more insight as to how these exploratory variables each affect the probability of being admitted into Graduate School.
-Plots were created to help visualize how the exploratory variables each affected the chances of being admitted into Graduate School. These plots are shown below.  
+Plots were created to help visualize how these exploratory variables each affected the probability of being admitted into Graduate School. These plots are shown below.  
 
-
-```{r, echo = FALSE, message= FALSE}
+### Plot 1: Probability of Admission vs GRE
+```{r, echo = TRUE, message= TRUE}
 #Once best model found make predictions
-df1 <- add_predictions(df, model_1, type = "response")
+df1 <- add_predictions(df, model_3, type = "response")
 
 #Visualize the data and look at the different relationships each exploratory variable has with admit
 ggplot(df1, aes(x=gre, y=pred, color = rank))+
   geom_point()+
   theme_minimal()+
-  labs(title = "Probablity of Admission vs GRE",subtitle = "Effect of GRE on Admissions",
-       x ="GRE", y= "Probablity of Admission")
+  labs(title = "Probablity of Admission vs GRE",subtitle = "Effect of Rank on Admissions",
+       x ="GRE", y= "Probablity of Admission", color = "Rank")
 
-
-
-ggplot(df1, aes(x=gpa, y=pred, color = rank))+
-  geom_point()+
-  theme_minimal()+
-  labs(title = "Probablity of Admission vs GPA",subtitle = "Effect of GPA on Admissions",
-       x ="GPA", y= "Probablity of Admission")
-
-
-
-
-ggplot(df1, aes(x=rank, y=pred, color = gpa))+
-  geom_point()+
-  theme_minimal()+
-  labs(title = "Probablity of Admission vs School Rank",subtitle = "Effect of School Rank on Admissions",
-       x ="Rank", y= "Probablity of Admission")
-
-
-
-ggplot(df1, aes(x=rank, y=pred, color = gre))+
-  geom_point()+
-  theme_minimal()+
-  labs(title = "Probablity of Admission vs School Rank",subtitle = "Effect of School Rank on Admissions",
-       x ="Rank", y= "Probablity of Admission")
 
 ```
 
+A positive correlation is shown, the higher the GRE the higher the probability of a student being admitted into graduate school. It was also observed that the school Rank had an effect on the probability being admitted, no matter the GRE score if a student was from a more top ranking school that student had better chances of being admitted into graduate school. 
 
+
+
+### Plot 2: Probability of Admission vs GPA
+```{r, echo = TRUE, message= TRUE}
+ggplot(df1, aes(x=gpa, y=pred, color = rank))+
+  geom_point()+
+  theme_minimal()+
+  labs(title = "Probablity of Admission vs GPA",subtitle = "Effect of Rank on Admissions",
+       x ="GPA", y= "Probablity of Admission", color = "Rank")
+
+```
+
+A positive correlation between the probability of admittance into Graduate School based on GPA was observed. In this plot it was also observed that the school rank had a significant effect on the probability of a student gaining acceptance into graduate school. A student from a rank 1 school with a low GPA had a higher probability of being admitted into graduate school than a student from a lower ranking school with a higher GPA.  
+
+
+# Conclusion
 In conclusion all three variables are significant in determining the probability that a student will
-be accepted into graduate school. Statistically from the P-values taken, and also from each respective 
-plot that was made. Each plot showing the expected correlation between one of the variables and the probability of a student being accepted into Graduate School. 
+be accepted into graduate school. It was observed that Rank as also noted in the summary function had a strong influence on the probability of being admitted into graduate school regardless of the GPA or GRE score that the student earned. 
