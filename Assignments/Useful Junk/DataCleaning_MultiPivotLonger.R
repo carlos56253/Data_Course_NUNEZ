@@ -1,4 +1,8 @@
 # Cleaning the bird_data set
+#broom package allows you to use tidy() and with that you give it a model
+#and it will run a summary () take the output and turn it into a nice df. 
+# %>% Is made by control shift m.
+#any time you're trying to understand a new package run browseVignettes(). 
 
 # packages
 library(tidyverse)
@@ -11,7 +15,7 @@ df <- read_csv("./Data/Bird_Measurements.csv") %>%
 names(df)[names(df) == "unsexed_mass"] <- "Unsexed_mass"
 
 janitor::make_clean_names(names(df))
-
+ 
 str(df)
 names(df)
 

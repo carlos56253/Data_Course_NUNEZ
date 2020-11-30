@@ -1,0 +1,116 @@
+---
+title: "Exam_3"
+author: "Carlos Nunez"
+date: "11/29/2020"
+output: html_document
+html_document:
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+  
+knitr::opts_chunk$set(echo = TRUE)
+
+#Load the libraries needed. 
+library(tidyverse)
+library(modelr)
+library(GGally)
+library(MASS)
+library(broom)
+```
+## Task 1
+The main objective is to recreate figure 1 which is provided. First I began by loading the data, then 
+viewed the data, cleaned the data, and finally visualized the data. In order to clean up the data first I rename the columns of interest, and then did pivot longer to organize data by transforming all of the professor's ranks into a column called Rank, and their respective salaries into a column called Salary. And finally removed the Tier's that weren't of interest. 
+```{r, echo=TRUE, message=TRUE, results="hide"}
+#Load first dataset, call it data frame 1. 
+df1 <- read_csv("./FacultySalaries_1995.csv") 
+
+#view data 
+head(df1)
+
+#Rename the columns of interest
+df1 <- df1 %>% rename(Full = AvgFullProfSalary,
+               Assoc = AvgAssocProfSalary,
+               Assist = AvgAssistProfSalary) 
+#Clean up the data 
+Salary <-  pivot_longer(df1,-c(1:4,8:17),
+                              names_to = "Rank", 
+                              values_to = "Salary", names_prefix = "Rank")
+
+#Make a New table that excludes the Tier VIIB which is not of interest.
+Salary1 <- filter(Salary, Tier == "I" | Tier == "IIA" | Tier == "IIB")
+
+```
+
+This is the visualization of the cleaned data showing the influences that Rank and Tier have on Salary.
+```{r, echo = TRUE, message= TRUE, results= "hide"}
+q <- ggplot(Salary1, aes(x = Rank, y= Salary, fill = Rank))+
+  geom_boxplot()+
+  facet_wrap(~Tier)+
+  labs(x="Rank")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+q
+
+#Use ggsave to save the plot as jpg on the current working directory. 
+ggsave(filename = "NUNEZ_Fig_1.jpg",q)
+
+```
+
+
+## Task 2
+Made an Anova table using the aov function, which is a more specific type of glm function.Afterwards I ran a summary function to help show how significant each independent variable is in its interactions with Salary.
+```{r,echo=TRUE, include = TRUE}
+
+Anova_Table <- aov(data = Salary, formula = 
+                   Salary ~ State + Tier + Rank)
+Anova_Table_Sum <- summary(Anova_Table)
+Anova_Table_Sum
+
+# Export txt file into current working directory. 
+capture.output(Anova_Table_Sum, file = "./Salary_ANOVA_Summary.txt")
+```
+In Conclusion each of the independent variables is significant with respect to their interaction with Salary. Therefore the Professors Rank, Tier, and State they taught in all have significant impact on their Salaries. 
+
+
+## Task 3
+Some of the main objective for this task are to load and clean up the data. Then to visualize the cleaned data and observe for the interactions of the variables of interest. To begin cleaning the data I used pivot longer. Selecting for all the Chemical columns of interest, and combining all the columns into one. And then assigned the values found within the original chemical columns which were the Mass-Spec Concentrations into a new column named Concentration. 
+```{r, echo = TRUE, message= TRUE, results= "hide"}
+#First load the data set.
+df2 <- read_csv("./Juniper_Oils.csv")
+
+#clean up the data set.
+df2_Chem <- pivot_longer(df2, cols = 11:33, names_to = "Chemical", values_to = "Concentration")
+```
+
+
+## Task 4
+```{r, echo =TRUE, message= FALSE, results= "hide"}
+#Visualize the cleaned up data. 
+p <- ggplot(df2_Chem, aes(x = YearsSinceBurn, y = Concentration))+
+  geom_smooth()+
+  facet_wrap(~Chemical, scales = "free")+
+  theme_minimal()
+p
+
+#Use ggsave to save the plot as jpg on the current working directory. 
+ggsave(filename = "NUNEZ_Fig_2.jpg",p)
+```
+
+Here we observe an inverse correlation between the Concentration of the Chemicals and the Years Since they were burnt. The longer the time since the Chemicals were burnt, the lower their Concentrations.
+
+
+## Task 5
+For this task I made a generalized linear model, to help show which chemical concentrations were significantly affected by Years Since Burn. With a p-value < 0.05. Afterwards I used the tidy function to help make the data frame. Lastly the filter function was used to  help select for the Chemical Concentrations with the most significant values in relation to Years Since Burn. 
+```{r, echo= TRUE, include= TRUE, results = "hide"}
+mod1 <- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn + Chemical)
+Model1 <- tidy(mod1)
+summary(mod1)
+```
+```{r,echo=TRUE, include= TRUE}
+#Answer
+SigChem <- filter(Model1, p.value < 0.05)
+```
