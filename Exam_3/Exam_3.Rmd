@@ -106,7 +106,7 @@ Here we observe an inverse correlation between the Concentration of the Chemical
 ## Task 5
 For this task I made a generalized linear model, to help show which chemical concentrations were significantly affected by Years Since Burn. With a p-value < 0.05. Afterwards I used the tidy function to help make the data frame. Lastly the filter function was used to  help select for the Chemical Concentrations with the most significant values in relation to Years Since Burn. 
 ```{r, echo= TRUE, include= TRUE, results = "hide"}
-mod1 <- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn + Chemical)
+mod1 <- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn * Chemical)
 Model1 <- tidy(mod1)
 summary(mod1)
 ```

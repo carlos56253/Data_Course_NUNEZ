@@ -93,7 +93,7 @@ ggsave(filename = "NUNEZ_Fig_2.jpg",p)
 #Made a glm() to help show which chemical concentrations were significantly affected by
 #Years Since Burn.Using the tidy function to help make the data frame and the filter 
 #function to  help select for the chemical concentrations with the most significant values. 
-mod1 <- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn + Chemical)
+mod1 <- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn * Chemical)
 Model1 <- tidy(mod1)
 summary(mod1)
 #Answer
