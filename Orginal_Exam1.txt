@@ -1,0 +1,47 @@
+library(tidyverse)
+
+
+
+
+
+
+df <- read.csv("./DNA_Conc_by_Extraction_Date.csv")
+
+
+#1
+hist(df$DNA_Concentration_Katy, xlab="DNA Concentration", main = "Katy Histogram")
+hist(df$DNA_Concentration_Ben, xlab= "DNA Concentration", main = "Ben Histogram")
+
+
+
+#2
+
+plot (x=(as.factor(df$Year_Collected)), y =  df$DNA_Concentration_Katy, xlab = "Year", ylab = "DNA Concentration",main= "Katy's Extraction")
+plot (x=(as.factor(df$Year_Collected)), y =  df$DNA_Concentration_Ben, xlab = "Year", ylab = "DNA Concentration",main= "Ben Extraction")
+
+#3 
+
+jpeg("./NUNEZ_Plot1.jpg")
+plot (x=(as.factor(df$Year_Collected)), y =  df$DNA_Concentration_Katy, xlab = "Year", ylab = "DNA Concentration",main= "Katy's Extraction")
+dev.off()
+
+
+
+jpeg("./NUNEZ_Plot2.jpg")
+plot (x=(as.factor(df$Year_Collected)), y =  df$DNA_Concentration_Ben, xlab = "Year", ylab = "DNA Concentration",main= "Ben Extraction")
+dev.off()
+       
+
+#4
+
+Lowcon_Ben <- df$DNA_Concentration_Ben / df$DNA_Concentration_Katy
+miniVal <- min(Lowcon_Ben)
+Pos <- which(miniVal == Lowcon_Ben)
+Ben_low_year <- df$Year_Collected[Pos]
+
+#5
+down_st <- filter(df,Lab %in% "Downstairs")
+
+png("./Ben_DNA_over_time.jpg")
+plot(x = as.POSIXct(down_st$Date_Collected), y = down_st$DNA_Concentration_Ben, xlab = "Date_Collected", ylab = "DNA_Concentration_Ben")
+dev.off()

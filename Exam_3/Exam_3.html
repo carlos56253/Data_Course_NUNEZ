@@ -479,7 +479,7 @@ ggsave(filename = &quot;NUNEZ_Fig_2.jpg&quot;,p)</code></pre>
 <div id="task-5" class="section level2">
 <h2>Task 5</h2>
 <p>For this task I made a generalized linear model, to help show which chemical concentrations were significantly affected by Years Since Burn. With a p-value &lt; 0.05. Afterwards I used the tidy function to help make the data frame. Lastly the filter function was used to help select for the Chemical Concentrations with the most significant values in relation to Years Since Burn.</p>
-<pre class="r"><code>mod1 &lt;- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn + Chemical)
+<pre class="r"><code>mod1 &lt;- glm(data = df2_Chem, formula = Concentration ~ YearsSinceBurn * Chemical)
 Model1 &lt;- tidy(mod1)
 summary(mod1)</code></pre>
 <pre class="r"><code>#Answer
