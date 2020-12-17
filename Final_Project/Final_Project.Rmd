@@ -27,7 +27,7 @@ library(jpeg)
 ```
 
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, include= TRUE}
 #Load in Financial Statements for Apple 2017
 AAPL_In <- GetIncome("AAPL", 2017)
 
@@ -40,7 +40,7 @@ head(AAPL_Bal)
 ```
 
 
-After downloading the financial statements we will also need to obtain Apple's stock price, in order to calculate the P/E Ratio and the EPS. 
+After downloading the financial statements we will also need to obtain Apple's stock price, in order to calculate the P/E Ratio. We will also take a look at EPS. 
 ```{r, echo=TRUE, include=FALSE, message=FALSE}
 # PE Ratio and EPS Process 
 
@@ -94,7 +94,7 @@ Current_Li <- filter(AAPL_Bal, Metric == "Liabilities, Current")
 
 ```
 
-
+Here we can see how each ratio is determined. EPS is given in the Income Statement. The P/E Ratio is given by dividing the stock price by EPS. The PB Ratio is given by substracting assets from liabilities and dividing it by the number of shares outstanding. The current ratio is by dividing current assets by the current liabilities. 
 ```{r, echo= TRUE, include= TRUE}
 #Earnings per share 2017
 Earnings_PS <- Earnings_PS$Amount
@@ -109,23 +109,25 @@ PB_Ratio <-  (as.numeric((tail(Assets$Amount, 1))) - as.numeric((tail(Liable$Amo
 Current_Ratio <- as.numeric((tail(Current_As$Amount, 1)))/ as.numeric((tail(Current_Li$Amount, 1)))
 
 ```
-
-```{r,echo= FALSE, include= FALSE}
+Now what do these ratios tell us about Apple? The P/E Ratio is a ratio used by value investor to determine if a stock is overvalued or undervalued. For a value investor a good P/E Ratio is right around the ball park of 20. It also reflects what the market currently thinks about the stock at that time. The PB ratio tells us the company's valuation relative to its book value. Book value being total assets minus intangible assets. A value investor will also look for a PB Ratio of 1 or below. The Current Ratio is used to help determine if a company has enough resources to meet its short term debts and obligations. As long as the company has a current ratio anywhere from 1.5-3 it should not have any problems meeting the short term debt and is positively looked upon by value investors. Finally EPS is representing the company's profits divided by the number of shares it has. It is a main indicator of a company's profitability. The higher, the better.  
+```{r,echo= FALSE, include= FALSE, message=FALSE}
 # create variables/ columns to complement data frame 
 Symbol <- "AAPL"
 
 Year <- 2017
 
 ```
-
+ 
 ```{r, echo= TRUE, include= TRUE, message=TRUE}
 Ratios <- data.frame(Symbol, Year, Earnings_PS, PE_Ratio, PB_Ratio, Current_Ratio)
 
 ```
+Here are the Financial Ratios for Apple, which we will use to compare to Microsoft. 
 
 
 
 
+Here we take a peak at Microsoft Financial Statements. 
 ```{r, echo= TRUE, include= TRUE}
 #Load in Financial Statements for Microsoft 2017
 MSFT_In <- GetIncome("MSFT", 2017)
@@ -136,7 +138,7 @@ head(MSFT_Bal)
 
 ```
 
-
+Here again we repeat the process of obtaining the values we want from the financial statements to help determine the P/E Ratio.  
 ```{r}
 #PE Ratio Process
 
@@ -169,7 +171,7 @@ Earnings_PS <- filter(MSFT_In, Metric == "Earnings Per Share Basic")  %>% tail(1
 ```
 
 
-```{r}
+```{r, echo=FALSE, include= FALSE}
 #PB Ratio process
 Assets <- filter(MSFT_Bal, Metric == "Assets")
 
@@ -180,7 +182,7 @@ Share_out <- filter(MSFT_In, Metric == "Weighted Average Number Of Shares Outsta
 
 ```
 
-```{r}
+```{r, echo=FALSE, include=FALSE}
 #Current Ratio process
 Current_As <- filter(MSFT_Bal, Metric == "Assets Current")
 
@@ -189,7 +191,7 @@ Current_Li <- filter(MSFT_Bal, Metric == "Liabilities Current")
 
 ```
 
-```{r}
+```{r, echo=TRUE, include= TRUE}
 #Earnings per share 2017
 Earnings_PS <- Earnings_PS$Amount
 
@@ -203,7 +205,7 @@ PB_Ratio <-  (as.numeric((tail(Assets$Amount, 1))) - as.numeric((tail(Liable$Amo
 Current_Ratio <- as.numeric((tail(Current_As$Amount, 1)))/ as.numeric((tail(Current_Li$Amount, 1)))
 ```
 
-```{r}
+```{r, echo=FALSE, include=FALSE}
 # create variables/ columns to complement data frame 
 Symbol <- "MSFT"
 
@@ -211,13 +213,13 @@ Year <- 2017
 
 ```
 
-```{r}
+```{r echo=TRUE, include=TRUE, message=TRUE}
 #build data frame from ratios
 Ratios1 <- data.frame(Symbol, Year, Earnings_PS, PE_Ratio, PB_Ratio, Current_Ratio)
 
 ```
 
-```{r}
+```{r, echo=TRUE, include=TRUE, message=TRUE}
 #Combine both company ratios into one data frames
 Company_Ratios <- rbind(Ratios,Ratios1)
 
@@ -225,7 +227,7 @@ Company_Ratios <- rbind(Ratios,Ratios1)
 
 
 
-```{r}
+```{r, echo=TRUE, message=FALSE, include=TRUE}
 #####Stock price predictions for Apple
 
 #Load in price data
@@ -255,7 +257,7 @@ Apple_Pre <- plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xl
 ```
 
 
-```{r}
+```{r, echo=TRUE, message=FALSE, include=TRUE}
 #####Stock price predictions for Microsoft
 
 #Load in price data
