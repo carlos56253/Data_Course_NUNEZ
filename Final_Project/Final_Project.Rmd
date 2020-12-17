@@ -1,0 +1,287 @@
+---
+title: "Final_Project"
+author: "Carlos Nunez"
+date: "12/16/2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    code_folding: hide
+---
+
+```{r setup, include=FALSE, message= FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+#First load the libraries 
+library(tidyverse)
+library(tidyquant)
+library(finreportr)
+library(prophet)
+library(patchwork)
+library(jpeg)
+```
+
+
+```{r, echo=TRUE}
+#Load in Financial Statements for Apple 2017
+AAPL_In <- GetIncome("AAPL", 2017)
+
+head(AAPL_In)
+
+AAPL_Bal <- GetBalanceSheet("AAPL",2017)
+
+head(AAPL_Bal)
+
+```
+
+
+
+```{r, echo=TRUE, include=FALSE, message=FALSE}
+# PE Ratio and EPS Process 
+
+#Load Data
+AAPL <- tq_get("AAPL")
+
+head(AAPL)
+#Organize data
+Dates <- AAPL$date
+Price <- as.numeric(AAPL$open)
+
+#rename columns
+AAPL <- data.frame(Dates = Dates , Price = Price)
+head(AAPL)
+#filter out years
+Years <- AAPL$Dates %>% 
+  as.character() %>% 
+  str_split("-") %>% 
+  purrr::map_chr(1)
+
+#Add new column with just years
+AAPL$Years <- Years
+#filter out the year wanted
+Stock <- AAPL %>% filter(Years == 2017) 
+
+
+# Earnings per share process, not taking into account years where there were stock splits
+Earnings <- filter(AAPL_In, Metric == "Earnings Per Share, Basic") %>% tail(2)
+#pick the row that doesn't have stock split
+Earnings_PS <- Earnings[1,]
+
+```
+
+
+```{r, echo=FALSE, message= FALSE, includ= FALSE}
+#PB Ratio process 
+Assets <- filter(AAPL_Bal, Metric == "Assets")
+
+Liable <- filter(AAPL_Bal, Metric == "Liabilities")
+
+Shares_out <- filter(AAPL_In, Metric == "Weighted Average Number of Shares Outstanding, Basic")
+```
+
+
+
+```{r,echo= FALSE, include=FALSE}
+#Current Ratio Process
+Current_As <- filter(AAPL_Bal, Metric == "Assets, Current")
+
+Current_Li <- filter(AAPL_Bal, Metric == "Liabilities, Current")
+
+```
+
+
+```{r, echo= TRUE, include= TRUE}
+#Earnings per share 2017
+Earnings_PS <- Earnings_PS$Amount
+
+#PE Ratio 2017
+PE_Ratio <- tail(Stock$Price, 1)/as.numeric(Earnings_PS)
+
+#PB Ratio 2017
+PB_Ratio <-  (as.numeric((tail(Assets$Amount, 1))) - as.numeric((tail(Liable$Amount, 1)))) / as.numeric((tail(Shares_out$Amount, 1)))
+
+#Current Ratio 2017
+Current_Ratio <- as.numeric((tail(Current_As$Amount, 1)))/ as.numeric((tail(Current_Li$Amount, 1)))
+
+```
+
+```{r,echo= FALSE, include= FALSE}
+# create variables/ columns to complement data frame 
+Symbol <- "AAPL"
+
+Year <- 2017
+
+```
+
+```{r, echo= TRUE, include= TRUE, message=TRUE}
+Ratios <- data.frame(Symbol, Year, Earnings_PS, PE_Ratio, PB_Ratio, Current_Ratio)
+
+```
+
+
+
+
+```{r, echo= TRUE, include= TRUE}
+#Load in Financial Statements for Microsoft 2017
+MSFT_In <- GetIncome("MSFT", 2017)
+head(MSFT_In)
+
+MSFT_Bal <- GetBalanceSheet("MSFT",2017)
+head(MSFT_Bal)
+
+```
+
+
+```{r}
+#PE Ratio Process
+
+#Load data
+MSFT <- tq_get("MSFT")
+
+head(MSFT)
+#Organize data
+Date <- MSFT$date
+Price <- as.numeric(MSFT$open)
+
+#Rename columns
+MSFT <- data.frame(Date = Date , Price = Price)
+head(MSFT)
+
+#Filter out years
+Years <- MSFT$Date %>% 
+  as.character() %>% 
+  str_split("-") %>% 
+  purrr::map_chr(1)
+#Add new column with just years
+MSFT$Years <- Years
+#filter out year wanted
+Stock <- MSFT %>% filter(Years == 2017) 
+
+
+#Earnings per share process
+Earnings_PS <- filter(MSFT_In, Metric == "Earnings Per Share Basic")  %>% tail(1)
+
+```
+
+
+```{r}
+#PB Ratio process
+Assets <- filter(MSFT_Bal, Metric == "Assets")
+
+Liable <- filter(MSFT_Bal, Metric == "Liabilities")
+
+Share_out <- filter(MSFT_In, Metric == "Weighted Average Number Of Shares Outstanding Basic")
+
+
+```
+
+```{r}
+#Current Ratio process
+Current_As <- filter(MSFT_Bal, Metric == "Assets Current")
+
+Current_Li <- filter(MSFT_Bal, Metric == "Liabilities Current")
+
+
+```
+
+```{r}
+#Earnings per share 2017
+Earnings_PS <- Earnings_PS$Amount
+
+#PE Ratio 2017
+PE_Ratio <- tail(Stock$Price, 1)/as.numeric(Earnings_PS)
+
+#PB Ratio 2017
+PB_Ratio <-  (as.numeric((tail(Assets$Amount, 1))) - as.numeric((tail(Liable$Amount, 1)))) / as.numeric((tail(Share_out$Amount, 1)))
+
+#Current Ratio 2017
+Current_Ratio <- as.numeric((tail(Current_As$Amount, 1)))/ as.numeric((tail(Current_Li$Amount, 1)))
+```
+
+```{r}
+# create variables/ columns to complement data frame 
+Symbol <- "MSFT"
+
+Year <- 2017
+
+```
+
+```{r}
+#build data frame from ratios
+Ratios1 <- data.frame(Symbol, Year, Earnings_PS, PE_Ratio, PB_Ratio, Current_Ratio)
+
+```
+
+```{r}
+#Combine both company ratios into one data frames
+Company_Ratios <- rbind(Ratios,Ratios1)
+
+```
+
+
+
+```{r}
+#####Stock price predictions for Apple
+
+#Load in price data
+AAPL_Pred <- tq_get("AAPL", from = "2010-01-01", to = "2017-09-30")
+#view data
+head(AAPL_Pred)
+
+#Assign Variables to fit Prophet requirements
+ds <- AAPL_Pred$date
+y <- as.numeric(AAPL_Pred$open)
+
+#Create new data frame that will work with Prophet
+AAPL_Pred <- data.frame(ds=ds, y=y)
+#view data
+head(AAPL_Pred)
+
+#Use Prophet to make stock price predictions for 5 years
+mod1 <- prophet(AAPL_Pred)
+future <- make_future_dataframe(mod1, period = 520)
+Predictions <- predict(mod1, future)
+
+#Plot predictions
+plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xlabel = "Date", ylabel = "Apple Stock Price")
+#Assign to a variable
+Apple_Pre <- plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xlabel = "Date", ylabel = "Apple Stock Price")
+
+```
+
+
+```{r}
+#####Stock price predictions for Microsoft
+
+#Load in price data
+MSFT_Pred <- tq_get("MSFT", from = "2010-01-01", to = "2017-09-30")
+#View data
+head(MSFT_Pred)
+
+#Assign Variables to fit Prophet requirements
+ds <- MSFT_Pred$date
+y <- as.numeric(MSFT_Pred$open)
+
+#Create new data frame that will work with Prophet
+MSFT_Pred <- data.frame(ds=ds, y=y)
+#view data
+head(MSFT_Pred)
+
+#Use Prophet to make stock price predictions for 5 years
+mod2 <- prophet(MSFT_Pred)
+future <- make_future_dataframe(mod2, period = 520)
+Predictions1 <- predict(mod2, future)
+
+#Plot predictions
+plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "Date", ylabel = "Microsoft Stock Price")
+
+#Assign to a variable
+Microsoft_Pre <- plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "Date", ylabel = "Microsoft Stock Price")
+
+#Both predictions side by side
+Apple_Pre + Microsoft_Pre
+
+```
+

@@ -1,0 +1,35 @@
+
+#JPM Bank....... #Not needed anymore
+JPM_divs <- xts()
+
+JPM_divs <- tq_get("JPM","dividends")
+
+years <- JPM_divs$date %>% 
+  as.character() %>% 
+  str_split("-") %>% 
+  purrr::map_chr(1)
+
+JPM_divs$years <- years
+
+
+JPM_ydivs <- JPM_divs %>% 
+  group_by(years) %>% 
+  summarize(Total_Yearly_Div = sum(value)) %>% 
+  mutate(Stock = "JPM")
+
+
+#Prices...... not needed anymore
+JPM <- tq_get("JPM")
+
+years <- JPM$date %>% 
+  as.character() %>% 
+  str_split("-") %>% 
+  purrr::map_chr(1)
+
+JPM$years <- years
+
+
+JPM_yprice <- JPM %>% 
+  group_by(years) %>% 
+  summarize(Total_Yearly_Price = sum(adjusted)) %>% 
+  mutate(Stock = "JPM")

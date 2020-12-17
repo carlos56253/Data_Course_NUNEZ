@@ -1,45 +1,60 @@
+#Load Libraries 
 library(tidyverse)
 library(tidyquant)
-library(xts)
-library(quantmod)
+library(finreportr)
 library(prophet)
-library(ggplot2)
+library(patchwork)
 
-Dow_jones <- tq_index("DOW")
+#####Stock price predictions for Apple
 
-Ticket <- Dow_jones$symbol
+#Load in price data
+AAPL_Pred <- tq_get("AAPL", from = "2010-01-01", to = "2017-09-30")
+#view data
+head(AAPL_Pred)
 
-divs <- xts()
+#Assign Variables to fit Prophet requirements
+ds <- AAPL_Pred$date
+y <- as.numeric(AAPL_Pred$open)
 
-for(sym in Ticket) {
-  divs <- merge(divs, getDividends(sym, from = "2010-01-01",
-                                   to = "2020-01-01", src = "yahoo", 
-                                   auto.assign =  FALSE, auto.update = FALSE,
-                                   verbose = FALSE, split.adjust = TRUE))
-}
+#Create new data frame that will work with Prophet
+AAPL_Pred <- data.frame(ds=ds, y=y)
+#view data
+head(AAPL_Pred)
 
+#Use Prophet to make stock price predictions for 5 years
+mod1 <- prophet(AAPL_Pred)
+future <- make_future_dataframe(mod1, period = 520)
+Predictions <- predict(mod1, future)
 
-
-quant1 <-  getDividends("V", from = "2010-01-01",
-                     to = "2020-01-01", src = "yahoo", 
-                     auto.assign =  FALSE, auto.update = FALSE,
-                     verbose = FALSE, split.adjust = TRUE)
-
-
-
-
-#use tidyquant 
-
-tidyquant1 <- tq_get("AAPL", get = "dividends", from = "2010-01-01")
-
-
-var <- xts()
-
-for(sym in Ticket){
-  var <-  tq_get(sym, get = "dividends", from = "2010-01-01")
-  
-}
+#Plot predictions
+Apple_Pre <-  plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xlabel = "Date", ylabel = "Apple Stock Price")
 
 
 
+#####Stock price predictions for Microsoft
 
+#Load in price data
+MSFT_Pred <- tq_get("MSFT", from = "2010-01-01", to = "2017-09-30")
+#View data
+head(MSFT_Pred)
+
+#Assign Variables to fit Prophet requirements
+ds <- MSFT_Pred$date
+y <- as.numeric(MSFT_Pred$open)
+
+#Create new data frame that will work with Prophet
+MSFT_Pred <- data.frame(ds=ds, y=y)
+#view data
+head(MSFT_Pred)
+
+#Use Prophet to make stock price predictions for 5 years
+mod2 <- prophet(MSFT_Pred)
+future <- make_future_dataframe(mod2, period = 520)
+Predictions1 <- predict(mod2, future)
+
+#Plot predictions
+Microsoft_Pre <- plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "Date", ylabel = "Microsoft Stock Price")
+
+
+#Both predictions side by side
+Apple_Pre + Microsoft_Pre
