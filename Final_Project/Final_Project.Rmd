@@ -9,7 +9,10 @@ output:
     toc_depth: 4
     code_folding: hide
 ---
-
+# Apple or Microsoft?
+Determining the better buy!
+In this stock analysis and comparison we will be looking at two long time rivals. Apple and Microsoft are members of the Dow Jones, an index which represents the top 30 companies in the United States of America. For our analysis we will be using the year 2017 as a reference and also make predictions for the stock price. Also in order to help evaluate each company we will the P/E Ratio, PB Ratio, EPS(Earnings-per-share), and Current Ratio.
+We will begin our analysis with Apple. First by retrieving the financial statements. We can take a peak here.
 ```{r setup, include=FALSE, message= FALSE}
 
 knitr::opts_chunk$set(echo = TRUE)
@@ -37,7 +40,7 @@ head(AAPL_Bal)
 ```
 
 
-
+After downloading the financial statements we will also need to obtain Apple's stock price, in order to calculate the P/E Ratio and the EPS. 
 ```{r, echo=TRUE, include=FALSE, message=FALSE}
 # PE Ratio and EPS Process 
 
