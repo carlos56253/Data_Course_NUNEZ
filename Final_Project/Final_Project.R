@@ -27,6 +27,9 @@ future <- make_future_dataframe(mod1, period = 520)
 Predictions <- predict(mod1, future)
 
 #Plot predictions
+plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xlabel = "Date", ylabel = "Apple Stock Price")
+
+#Save as variable
 Apple_Pre <-  plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xlabel = "Date", ylabel = "Apple Stock Price")
 
 
@@ -53,6 +56,9 @@ future <- make_future_dataframe(mod2, period = 520)
 Predictions1 <- predict(mod2, future)
 
 #Plot predictions
+plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "Date", ylabel = "Microsoft Stock Price")
+
+#Assign variable
 Microsoft_Pre <- plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "Date", ylabel = "Microsoft Stock Price")
 
 

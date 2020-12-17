@@ -11,7 +11,7 @@ output:
 ---
 # Apple or Microsoft?
 Determining the better buy!
-In this stock analysis and comparison we will be looking at two long time rivals. Apple and Microsoft are members of the Dow Jones, an index which represents the top 30 companies in the United States of America. For our analysis we will be using the year 2017 as a reference and also make predictions for the stock price. Also in order to help evaluate each company we will the P/E Ratio, PB Ratio, EPS(Earnings-per-share), and Current Ratio.
+In this stock analysis and comparison we will be looking at two long time rivals from a value investor point of veiw. Apple and Microsoft are members of the Dow Jones, an index which represents the top 30 companies in the United States of America. For our analysis we will be using the year 2017 as a reference and also make predictions for the stock price. Also in order to help evaluate each company we will the P/E Ratio, PB Ratio, EPS(Earnings-per-share), and Current Ratio.
 We will begin our analysis with Apple. First by retrieving the financial statements. We can take a peak here.
 ```{r setup, include=FALSE, message= FALSE}
 
@@ -27,7 +27,7 @@ library(jpeg)
 ```
 
 
-```{r, echo=TRUE, include= TRUE}
+```{r, echo=TRUE, include= TRUE, message=TRUE}
 #Load in Financial Statements for Apple 2017
 AAPL_In <- GetIncome("AAPL", 2017)
 
@@ -128,7 +128,7 @@ Here are the Financial Ratios for Apple, which we will use to compare to Microso
 
 
 Here we take a peak at Microsoft Financial Statements. 
-```{r, echo= TRUE, include= TRUE}
+```{r, echo= TRUE, include= TRUE, message=TRUE}
 #Load in Financial Statements for Microsoft 2017
 MSFT_In <- GetIncome("MSFT", 2017)
 head(MSFT_In)
@@ -139,7 +139,7 @@ head(MSFT_Bal)
 ```
 
 Here again we repeat the process of obtaining the values we want from the financial statements to help determine the P/E Ratio.  
-```{r}
+```{r, echo= TRUE, include=TRUE}
 #PE Ratio Process
 
 #Load data
@@ -191,7 +191,8 @@ Current_Li <- filter(MSFT_Bal, Metric == "Liabilities Current")
 
 ```
 
-```{r, echo=TRUE, include= TRUE}
+Here we see how the Microsoft Financial Ratios are calculated. 
+```{r, echo=TRUE, include= TRUE, message=TRUE}
 #Earnings per share 2017
 Earnings_PS <- Earnings_PS$Amount
 
@@ -218,15 +219,22 @@ Year <- 2017
 Ratios1 <- data.frame(Symbol, Year, Earnings_PS, PE_Ratio, PB_Ratio, Current_Ratio)
 
 ```
+Here are the Financial Ratios for Microsoft, which we will use to compare to Apple. 
 
+## The Financial Ratios
 ```{r, echo=TRUE, include=TRUE, message=TRUE}
 #Combine both company ratios into one data frames
 Company_Ratios <- rbind(Ratios,Ratios1)
 
 ```
+From these ratios we can first deduct that both companies have solid financial power. For a Value investor Apple might be a bit more appealing overall as its P/E ratio is more conservative as that from Microsoft. 
 
 
 
+Using a software created by the FaceBook Core Data Science Team we will be making predictions of the individual companies stock price performance for the next five years. The program used is named prophet as was developed to help ordinary people make quality predictions of different events without the need of being a professional data scientist. 
+
+
+Here we take a look at the predictions for Apple. 
 ```{r, echo=TRUE, message=FALSE, include=TRUE}
 #####Stock price predictions for Apple
 
@@ -257,6 +265,7 @@ Apple_Pre <- plot(mod1,Predictions, main = "Apple Stock Price / Predictions", xl
 ```
 
 
+Here we take a look at the predictions for Microsoft. 
 ```{r, echo=TRUE, message=FALSE, include=TRUE}
 #####Stock price predictions for Microsoft
 
@@ -284,9 +293,15 @@ plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "D
 
 #Assign to a variable
 Microsoft_Pre <- plot(mod2, Predictions1, main="Microsoft stock price / Predictions", xlabel = "Date", ylabel = "Microsoft Stock Price")
-
-#Both predictions side by side
-Apple_Pre + Microsoft_Pre
-
 ```
 
+## Stock Price Predictions
+```{r, echo=TRUE, include=TRUE, message=TRUE}
+#Both predictions side by side
+Apple_Pre + Microsoft_Pre
+```
+As observed the Apple Company has a best case scenario stock price of $70 a share, and worst case scenario 40 dollars; While its competitor Microsoft has a best case scenario of 125 dollars per share and worst case scenario 75 dollars a share.  
+
+# Conclusion
+
+In conclusion from a value investor point of view Apple would be the better buy of the two rivals. Again this is mainly due to the fact that its P/E Ratio in comparison to Microsoft is much more conservative and realistic. As Microsoft could seem to be more overvalued overall. But again as mentioned previously both companies show strong financial positions. The trick for the value investor however is always to buy a wonderful company but at a 'fair' price. 
